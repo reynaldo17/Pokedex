@@ -1,29 +1,20 @@
-import React, { useState } from 'react';
+import logo from './Pokédex_logo.png';
+import Main from './Components/main';
 import './App.css';
 
 function App() {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    console.log('Search Query:', searchQuery);
-  };
-
   return (
-    <div className="container">
-      <form onSubmit={handleSearchSubmit}>
-        <input
-          type="text"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={handleSearch}
-        />
-        <button type="submit">Search</button>
-      </form>
+    <div>
+    <nav>
+        <ul class="navbar">
+          <li><a href="mylist">My List</a></li>
+          {/* <li><a href="">Home</a></li> */}
+          <img src={logo} className="app-logo" alt="logo" />
+        </ul>
+      </nav>
+      <div className="container">
+        {/* <Main/> */}
+      </div>
     </div>
   );
 }
