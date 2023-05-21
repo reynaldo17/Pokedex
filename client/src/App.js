@@ -13,9 +13,7 @@ function App() {
           <img src={logo} className="app-logo" alt="logo" />
         </ul>
       </nav>
-      <div className="container">
         {/* <Main /> */}
-      </div>
     </div>
   );
 }

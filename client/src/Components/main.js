@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import Card from "./pokecard";
 import Pokeinfo from "./pokeinfo";
-import "./stylesheet.css";
+import "./stylesheet.css"; // Import the stylesheet for Main component
 
 const Main = () => {
   const [pokeData, setPokeData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [url, setUrl] = useState("https://pokeapi.co/api/v2/pokemon/ditto");
-  const [pokeDex, setPokeDex] = useState(null);
+  const [pokeDex, setPokeDex] = useState();
 
   const fetchPokemonData = async () => {
     setLoading(true);
     try {
       const response = await fetch(url);
       const data = await response.json();
-      setPokeData(data.results);
+      setPokeData(data.results); // Update the pokeData state with an array of Pokemon
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -24,6 +24,14 @@ const Main = () => {
   useEffect(() => {
     fetchPokemonData();
   }, [url]);
+
+  const handlePreviousClick = () => {
+    setUrl(pokeData[0]?.previous);
+  };
+
+  const handleNextClick = () => {
+    setUrl(pokeData[0]?.next);
+  };
 
   return (
     <div className="container">
@@ -42,21 +50,11 @@ const Main = () => {
           </div>
         )}
         <div className="btn-group">
-          <button
-            onClick={() => {
-              setUrl(pokeData[0]?.previous);
-            }}
-            disabled={!pokeData[0]?.previous}
-          >
+          <button onClick={handlePreviousClick} disabled={!pokeData[0]?.previous}>
             Previous
           </button>
 
-          <button
-            onClick={() => {
-              setUrl(pokeData[0]?.next);
-            }}
-            disabled={!pokeData[0]?.next}
-          >
+          <button onClick={handleNextClick} disabled={!pokeData[0]?.next}>
             Next
           </button>
         </div>
@@ -69,4 +67,3 @@ const Main = () => {
 };
 
 export default Main;
-
