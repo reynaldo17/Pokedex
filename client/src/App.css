@@ -45,12 +45,13 @@ nav img {
   height: 50px;
 }
 
-.navbar li a {
+.navbar li button {
   display: block;
   color: white;
   text-align: center;
-  padding: 14px 16px;
+  padding: 15px 16px;
   text-decoration: none;
+  background: transparent;
 }
 
 .navbar li a:hover {

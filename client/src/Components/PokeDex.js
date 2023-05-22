@@ -4,6 +4,11 @@ import './style.css';
 const Pokedex = () => {
   const [pokemonList, setPokemonList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [favorites, setFavorites] = useState(() => {
+  const storedFavorites = localStorage.getItem('favorites');
+  return storedFavorites ? JSON.parse(storedFavorites) : [];
+});
+
 
   useEffect(() => {
     fetch('https://pokeapi.co/api/v2/pokemon?limit=151')
@@ -30,6 +35,15 @@ const Pokedex = () => {
     setSearchQuery(event.target.value);
   };
 
+  const handleAddFavorite = (pokemon) => {
+    setFavorites((prevFavorites) => {
+      const updatedFavorites = [...prevFavorites, pokemon];
+      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      return updatedFavorites;
+    });
+  };
+  
+
   const filteredPokemonList = pokemonList.filter(pokemon =>
     pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -37,6 +51,8 @@ const Pokedex = () => {
   const PokemonDetails = ({ pokemon }) => {
     const { name, url } = pokemon;
     const [pokemonDetails, setPokemonDetails] = useState(null);
+
+    
 
     useEffect(() => {
       fetchPokemonDetails(url)
@@ -86,7 +102,7 @@ const Pokedex = () => {
       <div className="pokemon-list">
         {filteredPokemonList.map(pokemon => (
           <div className="pokemon-card" key={pokemon.name}>
-            <span className="add-symbol">+</span> {/* Add the add symbol */}
+            <button className="add-symbol" onClick={() => handleAddFavorite(pokemon)}>+</button>
             <img
               src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.url.split('/')[6]}.png`}
               alt={pokemon.name}
