@@ -1,69 +1,60 @@
-import React, { useState, useEffect } from "react";
-import Card from "./pokecard";
-import Pokeinfo from "./pokeinfo";
-import "./stylesheet.css"; // Import the stylesheet for Main component
+import React, { useEffect, useState } from 'react';
+import PokeList from './PokeList';
+import Pokedex from './PokeDex';
+import './stylesheet.css';
 
-const Main = () => {
-  const [pokeData, setPokeData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [url, setUrl] = useState("https://pokeapi.co/api/v2/pokemon/ditto");
-  const [pokeDex, setPokeDex] = useState();
+  const Main = () => {
+    const [pokeList, setPokeList] = useState([]);
+    const [prevUrl, setPrevUrl] = useState(null);
+    const [nextUrl, setNextUrl] = useState(null);
+    const [selectedPokemon, setSelectedPokemon] = useState(null);
 
-  const fetchPokemonData = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      setPokeData(data.results); // Update the pokeData state with an array of Pokemon
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    useEffect(() => {
+    fetchPokeList('https://pokeapi.co/api/v2/pokemon/ditto');
+    }, []);
+
+  const fetchPokeList = (url) => {
+    fetch(url)
+    .then((res) => res.json())
+    .then((data) => {
+      const { results, previous, next } = data;
+        setPokeList(results);
+        setPrevUrl(previous);
+        setNextUrl(next);
+    });
+  };
+
+  const handleLeftButtonClick = () => {
+    if (prevUrl) {
+      fetchPokeList(prevUrl);
     }
-    setLoading(false);
   };
 
-  useEffect(() => {
-    fetchPokemonData();
-  }, [url]);
-
-  const handlePreviousClick = () => {
-    setUrl(pokeData[0]?.previous);
+  const handleRightButtonClick = () => {
+    if (nextUrl) {
+      fetchPokeList(nextUrl);
+    }
   };
 
-  const handleNextClick = () => {
-    setUrl(pokeData[0]?.next);
+  const handleListItemClick = (pokemon) => {
+    setSelectedPokemon(pokemon);
   };
 
   return (
-    <div className="container">
-      <div className="left-content">
-        {loading ? (
-          <h1>Loading...</h1>
-        ) : (
-          <div className="card-container">
-            {pokeData.map((pokemon) => (
-              <Card
-                key={pokemon.name}
-                pokemonUrl={pokemon.url}
-                infoPokemon={setPokeDex}
-              />
-            ))}
-          </div>
-        )}
-        <div className="btn-group">
-          <button onClick={handlePreviousClick} disabled={!pokeData[0]?.previous}>
-            Previous
-          </button>
-
-          <button onClick={handleNextClick} disabled={!pokeData[0]?.next}>
-            Next
-          </button>
-        </div>
-      </div>
-      <div className="right-content">
-        <Pokeinfo data={pokeDex} />
-      </div>
+  <div className="pokedex">
+    <div className="leftontainer">
+    <Pokedex selectedPokemon={selectedPokemon} />
     </div>
+      <div className="rightcontainer">
+        <PokeList
+              pokeList={pokeList}
+              onListItemClick={handleListItemClick}
+              onLeftButtonClick={handleLeftButtonClick}
+              onRightButtonClick={handleRightButtonClick}
+            />
+    </div>
+  </div>
   );
-};
+  };
 
 export default Main;
