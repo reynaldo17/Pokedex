@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './Pokédex_logo.png';
-import Main from './components/main';
-// import './App.css';
+import Pokedex from './components/Pokedex';
+import './App.css';
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
           <img src={logo} className="app-logo" alt="logo" />
         </ul>
       </nav>
-      <div><Main /></div>
+      <div><Pokedex /></div>
     </div>
   );
 }

@@ -1,49 +1,102 @@
-import React from 'react';
-import './stylesheet.css';
+import React, { useState, useEffect } from 'react';
+import './style.css';
 
-const Pokedex = ({ selectedPokemon }) => {
-  const { name, id, types, weight, height, sprites } = selectedPokemon || {};
-  const { front_default: frontImage, back_default: backImage } = sprites || {};
+const Pokedex = () => {
+  const [pokemonList, setPokemonList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const capitalize = (str) => str[0]?.toUpperCase() + str.substr(1);
+  useEffect(() => {
+    fetch('https://pokeapi.co/api/v2/pokemon?limit=151')
+      .then(response => response.json())
+      .then(data => setPokemonList(data.results))
+      .catch(error => console.log(error));
+  }, []);
+
+  const fetchPokemonDetails = async (url) => {
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filteredPokemonList = pokemonList.filter(pokemon =>
+    pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const PokemonDetails = ({ pokemon }) => {
+    const { name, url } = pokemon;
+    const [pokemonDetails, setPokemonDetails] = useState(null);
+
+    useEffect(() => {
+      fetchPokemonDetails(url)
+        .then(data => setPokemonDetails(data))
+        .catch(error => console.log(error));
+    }, [url]);
+
+    if (!pokemonDetails) {
+      return null;
+    }
+
+    const { types, stats, moves } = pokemonDetails;
+
+    return (
+      <div className="pokemon-details">
+        <p><strong>Name:</strong> {capitalizeFirstLetter(name)}</p>
+        <p><strong>Type:</strong> {types.map(type => capitalizeFirstLetter(type.type.name)).join(', ')}</p>
+        <p><strong>Stats:</strong></p>
+        <ul>
+          {stats.map(stat => (
+            <li key={stat.stat.name}>
+              {capitalizeFirstLetter(stat.stat.name)}: {stat.base_stat}
+            </li>
+          ))}
+        </ul>
+        <p><strong>Attacks:</strong></p>
+        <ul>
+          {moves.slice(0, 4).map(move => (
+            <li key={move.move.name}>
+              {capitalizeFirstLetter(move.move.name)}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
 
   return (
-    <div className="leftcontainermainectioncontainer">
-      <div className="leftcontainermainsection">
-        <div className="mainsectionwhite">
-          <div className="mainsectionblack">
-            <div className={`mainscreen ${selectedPokemon ? '' : 'hide'}`}>
-              <div className="screenheader">
-                <span className="pokename">{capitalize(name)}</span>
-                <span className="pokeid">#{id?.toString().padStart(3, '0')}</span>
-              </div>
-              <div className="screenimage">
-                <img src={frontImage} className="pokefrontimage" alt="front" />
-                <img src={backImage} className="pokeback-image" alt="back" />
-              </div>
-              <div className="screendescription">
-                <div className="statstypes">
-                  <span className="poketypeone">{capitalize(types?.[0]?.type?.name)}</span>
-                  {types?.[1]?.type && (
-                    <span className="poketypetwo">{capitalize(types?.[1]?.type?.name)}</span>
-                  )}
-                </div>
-                <div className="screenstats">
-                  <p className="statsweight">
-                    weight: <span className="pokeweight">{weight}</span>
-                  </p>
-                  <p className="statsheight">
-                    height: <span className="pokeheight">{height}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
+    <div className="pokedex">
+      <h1>First Generation Pokemon</h1>
+      <input
+        type="text"
+        placeholder="Search Pokémon"
+        value={searchQuery}
+        onChange={handleSearch}
+      />
+      <div className="pokemon-list">
+        {filteredPokemonList.map(pokemon => (
+          <div className="pokemon-card" key={pokemon.name}>
+            <span className="add-symbol">+</span> {/* Add the add symbol */}
+            <img
+              src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.url.split('/')[6]}.png`}
+              alt={pokemon.name}
+            />
+            <PokemonDetails pokemon={pokemon} />
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
 };
 
 export default Pokedex;
-
