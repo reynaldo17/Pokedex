@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './style.css';
 
-const Pokedex = () => {
+const Pokedex = ({ favorites }) => {
   const [pokemonList, setPokemonList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [favorites, setFavorites] = useState(() => {
-  const storedFavorites = localStorage.getItem('favorites');
-  return storedFavorites ? JSON.parse(storedFavorites) : [];
-});
-
 
   useEffect(() => {
     fetch('https://pokeapi.co/api/v2/pokemon?limit=151')
@@ -36,12 +31,13 @@ const Pokedex = () => {
   };
 
   const handleAddFavorite = (pokemon) => {
-    setFavorites((prevFavorites) => {
-      const updatedFavorites = [...prevFavorites, pokemon];
+    const isPokemonAlreadyAdded = favorites.some((favorite) => favorite.name === pokemon.name);
+  
+    if (!isPokemonAlreadyAdded) {
+      const updatedFavorites = [...favorites, pokemon];
       localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-      return updatedFavorites;
-    });
-  };
+    }
+  };  
   
 
   const filteredPokemonList = pokemonList.filter(pokemon =>
@@ -51,8 +47,6 @@ const Pokedex = () => {
   const PokemonDetails = ({ pokemon }) => {
     const { name, url } = pokemon;
     const [pokemonDetails, setPokemonDetails] = useState(null);
-
-    
 
     useEffect(() => {
       fetchPokemonDetails(url)

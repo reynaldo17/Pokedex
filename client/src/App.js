@@ -6,7 +6,10 @@ import './App.css';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('pokedex');
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(() => {
+    const storedFavorites = localStorage.getItem('favorites');
+    return storedFavorites ? JSON.parse(storedFavorites) : [];
+  });
 
   const handleNavigation = (page) => {
     setCurrentPage(page);
@@ -31,7 +34,4 @@ function App() {
 }
 
 export default App;
-
-
-
 
