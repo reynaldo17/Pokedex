@@ -17,5 +17,6 @@ const FavoritePokemon = ({ favorites }) => {
   );
 };
 
+
 export default FavoritePokemon;
 
